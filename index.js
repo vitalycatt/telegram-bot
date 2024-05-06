@@ -1,6 +1,21 @@
 const TelegramApi = require("node-telegram-bot-api");
 const { gameOptions, againOptions } = require("./options");
 
+const wrongAnswersStickers = [
+  "https://sl.combot.org/chelici/webp/4xf09f8c9f.webp",
+  "https://sl.combot.org/chelici/webp/111xf09f8c9f.webp",
+  "https://sl.combot.org/chelici/webp/90xf09f8c9f.webp",
+  "https://sl.combot.org/chelici/webp/86xf09f8c9f.webp",
+  "https://sl.combot.org/chelici/webp/70xf09f8c9f.webp",
+  "https://sl.combot.org/chelici/webp/23xf09f8c9f.webp",
+  "https://sl.combot.org/chelici/webp/18xf09f8c9f.webp",
+  "https://sl.combot.org/chelici/webp/11xf09f8c9f.webp",
+];
+
+const correctAnswersStickers = [
+  "https://sl.combot.org/chelici/webp/103xf09f8c9f.webp",
+];
+
 const token = "6676257405:AAFnU70Mmzw9jQLqPSjK6qrGZRpNIO6zGkw";
 
 const bot = new TelegramApi(token, { polling: true });
@@ -10,7 +25,7 @@ const chats = {};
 const startGame = async (chatId) => {
   await bot.sendMessage(
     chatId,
-    `Сейчас я загадаю цифру от 0 до 9, а ты должен ее угадать!`
+    `Сейчас я загадаю цифру от 0 до 9, а ты ее попробуешь угадать :Ж`
   );
   const randomNumber = Math.floor(Math.random() * 10);
   chats[chatId] = randomNumber;
@@ -32,15 +47,22 @@ const start = async () => {
       if (text === "/start") {
         await bot.sendSticker(
           chatId,
-          "https://tlgrm.ru/_/stickers/ea5/382/ea53826d-c192-376a-b766-e5abc535f1c9/7.webp"
+          "https://sl.combot.org/chelici/webp/26xf09f8c9f.webp"
         );
-        return bot.sendMessage(
-          chatId,
-          `Добро пожаловать в телеграм бот автора ютуб канала ULBI TV`
+        return (
+          bot.sendMessage(chatId, `Напиши для этого '/game'`),
+          bot.sendMessage(
+            chatId,
+            `Привет! Ты в приколдесном чат-боте(если шо), тут ты можешь поиграть в угадайку :)`
+          )
         );
       }
 
       if (text === "/info") {
+        await bot.sendSticker(
+          chatId,
+          "https://sl.combot.org/chelici/webp/25xf09f8c9f.webp"
+        );
         return bot.sendMessage(
           chatId,
           `Тебя зовут ${msg.from.first_name} ${msg.from.last_name}`
@@ -51,9 +73,17 @@ const start = async () => {
         return startGame(chatId);
       }
 
-      return bot.sendMessage(chatId, "Я тебя не понимаю, попробуй еще раз!)");
+      await bot.sendSticker(
+        chatId,
+        "https://sl.combot.org/chelici/webp/5xf09f8c9f.webp"
+      );
+      return bot.sendMessage(chatId, "Шото пошло не по плану :(");
     } catch (e) {
-      return bot.sendMessage(chatId, "Произошла какая то ошибочка!)");
+      await bot.sendSticker(
+        chatId,
+        "https://sl.combot.org/chelici/webp/5xf09f8c9f.webp"
+      );
+      return bot.sendMessage(chatId, "Шото пошло не по плану :(");
     }
   });
 
@@ -64,12 +94,19 @@ const start = async () => {
     if (data === "/again") return startGame(chatId);
 
     if (data == chats[chatId]) {
+      await bot.sendSticker(chatId, correctAnswersStickers[0]);
       return bot.sendMessage(
         chatId,
-        `Поздравляю, ты отгадал цифру ${chats[chatId]}`,
+        `Красавчик! Ты отгадал цифру ${chats[chatId]}`,
         againOptions
       );
     } else {
+      await bot.sendSticker(
+        chatId,
+        wrongAnswersStickers[
+          Math.floor(Math.random() * wrongAnswersStickers.length)
+        ]
+      );
       return bot.sendMessage(
         chatId,
         `К сожалению ты не угадал, бот загадал цифру ${chats[chatId]}`,
